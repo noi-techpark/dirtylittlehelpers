@@ -6,8 +6,14 @@ import math
 class JsonDiff:
     
     def __init__(self, json1, json2):
-        self.json1 = JsonDiff.sort_json(json.loads(json1))
-        self.json2 = JsonDiff.sort_json(json.loads(json2))
+        if json1:
+            self.json1 = JsonDiff.sort_json(json.loads(json1))
+        else:
+            self.json1 = ""
+        if json2:
+            self.json2 = JsonDiff.sort_json(json.loads(json2))
+        else:
+            self.json2 = ""
         self.json1 = JsonDiff.__clean_dump(self.json1)
         self.json2 = JsonDiff.__clean_dump(self.json2)
         self.difftxt = None
@@ -63,6 +69,7 @@ class JsonDiff:
                         matched = True
                         break
                 if matched:
+                    yield('i ' + line[2:] + "\n")
                     continue
     
             if line[0] == '-':
@@ -135,9 +142,11 @@ class JsonDiff:
                     keys = ''
                     for key in v_sorted:
                         keys += key[0]
+                        if key[0] == 'id' and isinstance(key[1], (str, int)):
+                            keys = str(key[1]) + '_' + keys
                     pairs.append(('$__list_' + str(type(key[0]).__name__) + '_' + keys, v_sorted))
                 else:
-                    pairs.append(('$__list_' +  str(type(v).__name__), v))
+                    pairs.append(('$__list_' +  str(type(v).__name__) + '_' + str(v), v))
             
         return sorted(pairs, key=lambda x: x[0])
 
