@@ -4,9 +4,9 @@ import csv
 from datetime import datetime
 import operator
 import re
+from csv import Dialect, register_dialect
 
 def main():
-    print(sys.argv)
     if len(sys.argv) != 4:
         print("USAGE: %s input monthnumber year" % os.path.basename(sys.argv[0]))
         print("       input        filename of a temporal data file (TSV)")
@@ -26,10 +26,8 @@ def main():
     parser = re.compile("([^:]*): (.*$)")
 
     with open(csvFilename, 'r') as csvfile, open(csvFilenameOut, 'w+') as csvfileout:
-        dialect = csv.Sniffer().sniff(csvfile.read(1024))
-        csvfile.seek(0)
-        reader = csv.reader(csvfile, dialect)
-        writer = csv.writer(csvfileout, dialect)
+        reader = csv.reader(csvfile, dialect='thunderbird')
+        writer = csv.writer(csvfileout, dialect='thunderbird')
 
         if csv.Sniffer().has_header(csvfile.read(1024)):
             csvfile.seek(0)
@@ -48,8 +46,12 @@ def main():
             start_date = datetime.strptime(row[1], '%m/%d/%y').date()
 
             if start_date.year != year or start_date.month != month:
-                #print("SKIP")
                 continue
+
+            if row[5] == 'True':
+                full_day_event = True
+            else: 
+                full_day_event = False
 
             start_time = datetime.strptime(row[2], '%I:%M:%S %p')
             start_time_str = datetime.strftime(start_time, '%H:%M')
@@ -59,7 +61,19 @@ def main():
 
             diff_hours = (end_time - start_time).total_seconds() / 3600
 
+            if full_day_event:
+                start_time_str = ''
+                end_time_str = ''
+                diff_hours = ''
+                if len(proj) == 0:
+                    proj = 'Abwesend'
+                    warning = f'CHANGED PROJECT NAME to "{proj}"'
+                print(f"FULL DAY EVENT: {start_date} - {proj} - {subj} / !!! {warning} !!!")
             #print(start_date.strftime("%V"), start_date, proj, subj, start_time_str, end_time_str, diff_hours)
+
+            if len(proj) == 0:
+                print(f"MISSING PROJECT NAME: {start_date} - {subj} - {start_time_str} - {end_time_str}")
+
             writer.writerow([start_date.strftime("%V"), start_date, proj, subj, start_time_str, end_time_str, diff_hours])
 
 
@@ -72,6 +86,17 @@ def sort_order(row):
         row[0]
     )
 
+
+class thunderbird(Dialect):
+    """Describe the usual properties of Thunderbird-calendar-generated CSV files."""
+    delimiter = ','
+    quotechar = '"'
+    doublequote = True
+    skipinitialspace = False
+    lineterminator = '\r\n'
+    quoting = 1
+
+register_dialect("thunderbird", thunderbird)
 
 if __name__ == "__main__":
     main()
