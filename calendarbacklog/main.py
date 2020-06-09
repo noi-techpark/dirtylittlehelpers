@@ -68,7 +68,7 @@ def main():
                 if len(proj) == 0:
                     proj = 'Abwesend'
                     warning = f'CHANGED PROJECT NAME to "{proj}"'
-                print(f"FULL DAY EVENT: {start_date} - {proj} - {subj} / !!! {warning} !!!")
+                    print(f"FULL DAY EVENT: {start_date} - {proj} - {subj} / !!! {warning} !!!")
             #print(start_date.strftime("%V"), start_date, proj, subj, start_time_str, end_time_str, diff_hours)
 
             if len(proj) == 0:
