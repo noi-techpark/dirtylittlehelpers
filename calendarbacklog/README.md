@@ -1,11 +1,15 @@
-Script to parse outlook entries to timesheet for given month
+Script to parse outlook entries of a timesheet for given month
 
 How to use:
 
-> python3 main.py <Filename> <M> <yyyy>
+```
+python3 main.py <Filename> <M> <yyyy>
+```
 
 Example:
 
 ``` 
-python3 main.py noi\ \(Kalender\).csv 4 2020
+python3 main.py noi-kalender.csv 4 2020
 ```
+
+NB: It will skip all lines that start with a `*`.

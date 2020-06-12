@@ -36,6 +36,10 @@ def main():
         sortedlist = sorted(reader, key=sort_order, reverse=False)
 
         for row in sortedlist:
+            row[0] = row[0].strip()
+            if row[0][0] == '*':
+                print(f'SKIPPING {row[0]}')
+                continue
             parsed = parser.split(row[0])
             if len(parsed) == 1:
                 subj = parsed[0]
@@ -65,10 +69,11 @@ def main():
                 start_time_str = ''
                 end_time_str = ''
                 diff_hours = ''
+                warning = '(no warning)'
                 if len(proj) == 0:
                     proj = 'Abwesend'
                     warning = f'CHANGED PROJECT NAME to "{proj}"'
-                    print(f"FULL DAY EVENT: {start_date} - {proj} - {subj} / !!! {warning} !!!")
+                print(f"FULL DAY EVENT: {start_date} - {proj} - {subj} / !!! {warning} !!!")
             #print(start_date.strftime("%V"), start_date, proj, subj, start_time_str, end_time_str, diff_hours)
 
             if len(proj) == 0:
