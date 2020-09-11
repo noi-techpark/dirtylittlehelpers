@@ -35,10 +35,13 @@ def main():
 
         sortedlist = sorted(reader, key=sort_order, reverse=False)
 
+        old_date = None
+        count_hours = 0.0
         for row in sortedlist:
             row[0] = row[0].strip()
+            start_date = datetime.strptime(row[1], '%m/%d/%y').date()
             if row[0][0] == '*':
-                print(f'SKIPPING {row[0]}')
+                print(f'{start_date}: SKIPPING {row[0]}')
                 continue
             parsed = parser.split(row[0])
             if len(parsed) == 1:
@@ -47,7 +50,6 @@ def main():
             else:
                 proj = parsed[1]
                 subj = parsed[2]
-            start_date = datetime.strptime(row[1], '%m/%d/%y').date()
 
             if start_date.year != year or start_date.month != month:
                 continue
@@ -57,6 +59,12 @@ def main():
             else: 
                 full_day_event = False
 
+            if old_date != None and start_date != old_date:
+                if count_hours < 8:
+                    print(f"{old_date}: WORKED ONLY {count_hours} HOURS")
+                count_hours = 0
+                old_date = start_date
+
             start_time = datetime.strptime(row[2], '%I:%M:%S %p')
             start_time_str = datetime.strftime(start_time, '%H:%M')
             end_date = datetime.strptime(row[3], '%m/%d/%y').date()
@@ -64,20 +72,22 @@ def main():
             end_time_str = datetime.strftime(end_time, '%H:%M')
 
             diff_hours = (end_time - start_time).total_seconds() / 3600
+            count_hours += diff_hours
 
             if full_day_event:
                 start_time_str = ''
                 end_time_str = ''
                 diff_hours = ''
+                count_hours = 8
                 warning = '(no warning)'
                 if len(proj) == 0:
                     proj = 'Abwesend'
                     warning = f'CHANGED PROJECT NAME to "{proj}"'
-                print(f"FULL DAY EVENT: {start_date} - {proj} - {subj} / !!! {warning} !!!")
+                print(f"{start_date}: FULL DAY EVENT: {proj} - {subj} / !!! {warning} !!!")
             #print(start_date.strftime("%V"), start_date, proj, subj, start_time_str, end_time_str, diff_hours)
 
             if len(proj) == 0:
-                print(f"MISSING PROJECT NAME: {start_date} - {subj} - {start_time_str} - {end_time_str}")
+                print(f"{start_date}: MISSING PROJECT NAME: {subj} - {start_time_str} - {end_time_str}")
 
             writer.writerow([start_date.strftime("%V"), start_date, proj, subj, start_time_str, end_time_str, diff_hours])
 
@@ -92,7 +102,7 @@ def sort_order(row):
     )
 
 
-class thunderbird(Dialect):
+class Thunderbird(Dialect):
     """Describe the usual properties of Thunderbird-calendar-generated CSV files."""
     delimiter = ','
     quotechar = '"'
@@ -101,7 +111,7 @@ class thunderbird(Dialect):
     lineterminator = '\r\n'
     quoting = 1
 
-register_dialect("thunderbird", thunderbird)
+register_dialect("thunderbird", Thunderbird)
 
 if __name__ == "__main__":
     main()
