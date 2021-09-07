@@ -19,17 +19,32 @@ IGNORE = [
     r'"parentStation": ".*"',
     r'"linegeometry": ".*"',
     r'"aquisitionIntervalls"',
-    r'"acquisitionIntervals"'
+    r'"acquisitionIntervals"',
+    r'"desc"',
+    r'"en": ".*"',
+    r'"default". ".*"',
+    r'"unit": null',
+    r'"unit": ""',
+    r'}',
+    r'{'
 ]
 
-VERBOSE = False
-URL_READER_1 = "https://tomcatsec.testingmachine.eu/reader"
+VERBOSE = True
+URL_READER_1 = "http://52.214.47.112:8080/reader"
 URL_READER_2 = "http://127.0.0.1:8081/reader"
 REPEATS = 1
+MAX_STATIONS = 1
 
 def main():
 
     resp = requests.get(URL_READER_2 + "/stations")
+    if resp.status_code != 200:
+        echo.outred("ERROR: Cannot get station names\n")
+        echo.outred("ERROR: Code = " + str(resp.status_code) + "\n")
+        echo.outred("ERROR: Msg  = " + resp.text + "\n")
+        
+        return
+    
     stationTypes = json.loads(resp.text)
 
     stations = {}
@@ -38,30 +53,71 @@ def main():
                             params={'stationType': stationType})
         stations[stationType] = json.loads(resp.text)
 
-#    urls = []
-#    params = []
-#    for s in stations:
-#        if len(stations[s]) == 0:
-#            continue
-#        urls.append("/station-details")
-#        params.append({'stationType': s, 'stationId': stations[s][0]})
-#        if len(stations[s]) > 1:
-#            urls.append("/station-details")
-#            params.append({'stationType': s, 'stationId': stations[s][-1]})
-#            
-#    output(urls, params)
-
     urls = []
     params = []
-    for s in stations:
-        if not stations[s]:  #list empty
+    stations2ignore = ['TrafficStreetFactor']
+    for stype in stations:
+        if len(stations[stype]) == 0:
             continue
-        urls.append("/types")
-        params.append({'stationType': s, 'stationId': stations[s][0]})
-        if len(stations[s]) > 1:
-            urls.append("/types")
-            params.append({'stationType': s, 'stationId': stations[s][-1]})
+        if stype in stations2ignore:
+            print("IGNORED /station-details for " + stype)
+            continue
+        
+        urls.append("/station-details")
+        params.append({'stationType': stype})        
+        
+        for i, station in enumerate(stations[stype]):
+            if MAX_STATIONS > 0 and i >= MAX_STATIONS:
+                break
+            urls.append("/station-details")
+            params.append({'stationType': stype, 'stationId': station})
             
+    output(urls, params)
+    return
+        
+    urls = []
+    params = []
+    stations2ignore = ['TrafficStreetFactor']
+    for stype in stations:
+        if len(stations[stype]) == 0:
+            continue
+        if stype in stations2ignore:
+            print("IGNORED /stations for " + stype)
+            continue
+
+        urls.append("/stations")
+        params.append({'stationType': stype})
+        
+        for i, station in enumerate(stations[stype]):
+            if MAX_STATIONS > 0 and i >= MAX_STATIONS:
+                break
+            urls.append("/stations")
+            params.append({'stationType': stype, 'stationId': station})
+            
+    output(urls, params)
+    return        
+
+#    urls = []
+#    params = []
+#    stations2ignore = ['TrafficStreetFactor', 'Mobilestation', 'ParkingStation']
+#    for stype in stations:
+#        if not stations[stype]:  #list empty
+#            continue
+#        if stype in stations2ignore:
+#            print("IGNORED /station-details for " + stype)
+#            continue
+#        
+#        for i, station in enumerate(stations[stype]):
+#            if MAX_STATIONS > 0 and i >= MAX_STATIONS:
+#                break
+#            urls.append("/types")
+#            params.append({'stationType': stype, 'stationId': station})
+#
+#    urls = ["/types"]
+#    params = [{'stationType': 'Linkstation'}]
+#            
+#    output(urls, params)
+#    return
 
 #    urls = [
 #        "/stations",
@@ -71,8 +127,59 @@ def main():
 #    urls = ["/station-details"]
 #    params = [{'stationType': 'EChargingStation', 'stationId': 'DW-000027'}]
 
-    urls = ["/types"]
-    params = [{'stationType': 'TrafficSensor'}]
+
+    urls = []
+    params = []
+    stations2ignore = ['TrafficStreetFactor', 'TrafficSensor', 'Mobilestation']
+    for stype in stations:
+        if not stations[stype]:  #list empty
+            continue
+        if stype in stations2ignore:
+            print("IGNORED /station-details for " + stype)
+            continue
+        
+        for i, station in enumerate(stations[stype]):
+            if MAX_STATIONS > 0 and i >= MAX_STATIONS:
+                break
+            urls.append("/data-types")
+            params.append({'stationType': stype, 'stationId': station})
+
+#    urls = ["/data-types"]
+#    params = [{'stationType': 'Bluetoothstation', 'stationId': 'meinstein'}]
+        
+    output(urls, params)
+    return        
+        
+#    urls = ["/stations"]
+#    params = [{'stationType': 'BikesharingStation'}]        
+        
+#    urls = []
+#    params = []        
+#    for s in stations:
+#        if not stations[s]:
+#            continue
+#        urls.append("/last-record")
+#        params.append({'stationType': s, 'stationId': stations[s][0]})
+
+#    urls = []
+#    params = []        
+#    for s in stations:
+#        if not stations[s]:
+#            continue
+#        resp = requests.get(URL_READER_2 + "/types", params={'stationType': s, 'stationId': stations[s][0]})
+#        if resp.status_code != 200:
+#            continue
+#        resp = json.loads(resp.text)
+#        if not resp:
+#            continue
+#        datatype = resp[0]['id']
+#        
+#        urls.append("/records")
+#        params.append({'stationType': s, 
+#                       'stationId': stations[s][0], 
+#                       'typeId': datatype, 
+#                       'start': 1450000000000, 
+#                       'end':   1500000000000})
 
     output(urls, params)
 
@@ -88,7 +195,7 @@ def output(urls, params):
             echo.outred(url)
             print()
             raise e
-        
+            
         if result['status']:
             echo.outgreen("SUCCESS")
         else:

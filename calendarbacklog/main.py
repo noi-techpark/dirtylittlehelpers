@@ -40,6 +40,10 @@ def main():
         for row in sortedlist:
             row[0] = row[0].strip()
             start_date = datetime.strptime(row[1], '%m/%d/%y').date()
+
+            if start_date.year != year or start_date.month != month:
+                continue
+
             if row[0][0] == '*':
                 print(f'{start_date}: SKIPPING {row[0]}')
                 continue
@@ -51,8 +55,6 @@ def main():
                 proj = parsed[1]
                 subj = parsed[2]
 
-            if start_date.year != year or start_date.month != month:
-                continue
 
             if row[5] == 'True':
                 full_day_event = True

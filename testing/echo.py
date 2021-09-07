@@ -30,11 +30,14 @@ def outred(line):
 def outgreen(line):
     outclr(line, GREEN)
     
-def outdiff(difftxt):
+def outdiff(difftxt, show_equal_ignored = False):
     for line in difftxt.splitlines(True):
         if line[0] == '-':
             outred(line)
         elif line[0] == '+':
             outgreen(line)
+        elif line[0] in ['i', ' ']:
+            if show_equal_ignored:
+                out(line)
         else:
             out(line)

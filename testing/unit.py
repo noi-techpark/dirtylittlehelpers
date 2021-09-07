@@ -1,26 +1,29 @@
 import requests
 from jsontools import JsonDiff
 
-def test(host1, host2, url_par, repeats, ignore_rules, ignore_active):
+def test(host1, host2, url_par, repeats, ignore_rules, ignore_active, header1, header2):
     url1 = host1 + url_par[0]
     url2 = host2 + url_par[0]
-    
+        
     result = {
             'A'     : host1,
             'B'     : host2,
             'path'  : url_par[0],
             'params': url_par[1], 
+            'headerA' : header1,
+            'headerB' : header2,
         }
 
     time1 = 0
-    for x in range(repeats):
-        resp1 = requests.get(url1, url_par[1])
+    for _ in range(repeats):
+#        print(url1, url_par[1])
+        resp1 = requests.get(url1, url_par[1], headers = header1)
         time1 += resp1.elapsed.total_seconds()
     time1 /= repeats
 
     time2 = 0
-    for x in range(repeats):
-        resp2 = requests.get(url2, url_par[1])
+    for _ in range(repeats):
+        resp2 = requests.get(url2, url_par[1], headers = header2)
         time2 += resp1.elapsed.total_seconds()
     time2 /= repeats
 
