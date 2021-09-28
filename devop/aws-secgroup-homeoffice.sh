@@ -37,7 +37,7 @@ else
     aws ec2 revoke-security-group-ingress \
         --group-name generic-http-https-homeoffices \
         --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges="[{CidrIp=$MYOLDCIDR,Description=$MYSG_DESC}]" \
-        IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges="[{CidrIp=$MYOLDCIDR,Description=$MYSG_DESC}]"
+        IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges="[{CidrIp=$MYOLDCIDR,Description=$MYSG_DESC}]" || true
 
     aws ec2 authorize-security-group-ingress \
         --group-name generic-http-https-homeoffices \
@@ -64,7 +64,7 @@ else
 
     aws ec2 revoke-security-group-ingress \
         --group-name generic-ssh-homeoffices \
-        --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges="[{CidrIp=$MYOLDCIDR,Description=$MYSG_DESC}]" 
+        --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges="[{CidrIp=$MYOLDCIDR,Description=$MYSG_DESC}]" || true 
 
     aws ec2 authorize-security-group-ingress \
         --group-name generic-ssh-homeoffices \
@@ -89,7 +89,7 @@ else
 
     aws ec2 revoke-security-group-ingress \
         --group-name generic-rds-homeoffices \
-        --ip-permissions IpProtocol=tcp,FromPort=5432,ToPort=5432,IpRanges="[{CidrIp=$MYOLDCIDR,Description=$MYSG_DESC}]" 
+        --ip-permissions IpProtocol=tcp,FromPort=5432,ToPort=5432,IpRanges="[{CidrIp=$MYOLDCIDR,Description=$MYSG_DESC}]" || true
 
     aws ec2 authorize-security-group-ingress \
         --group-name generic-rds-homeoffices \
