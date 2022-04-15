@@ -12,6 +12,8 @@ CAT_ALLOWED = [
     "Training",
     "Administration",
     "Special Project",
+    "Special Project: NOI Community App",
+    "Special Project: St. Virtual",
     "Opportunity",
     "Management",
     "Open Data Hub",
@@ -21,7 +23,8 @@ CAT_ALLOWED = [
 SKIP_PREFIXES = [
     "*",
     "Abwesend",
-    "Urlaub"
+    "Urlaub",
+    "Feiertag"
 ]
 
 def main():
@@ -71,11 +74,11 @@ def main():
                 print_inf(f"Skipping (prefix '{prefix}') -> {r['subject']}")
                 continue
 
-            if not category:
-                print_err(f"NO category -> {r['subject']}")
+            # if not category:
+            #     print_err(f"NO category -> {r['subject']}")
 
-            if category not in CAT_ALLOWED:
-                print_err(f"Wrong category '{category}' -> {r['subject']}")
+            # if category not in CAT_ALLOWED:
+            #     print_err(f"Wrong category '{category}' -> {r['subject']}")
 
             print(f'"{subj}",{start_date},{start_time},{end_date},{end_time},{category}')
 

@@ -2,7 +2,6 @@ import sys
 import os
 import csv
 from datetime import datetime
-import operator
 import re
 from csv import Dialect, register_dialect
 
@@ -95,13 +94,17 @@ def main():
 
 
 def sort_order(row):
-    return (
-        datetime.strptime(row[1], '%m/%d/%y'),
-        datetime.strptime(row[2], '%I:%M:%S %p'),
-        datetime.strptime(row[3], '%m/%d/%y'),
-        datetime.strptime(row[4], '%I:%M:%S %p'),
-        row[0]
-    )
+    try:
+        return (
+            datetime.strptime(row[1], '%m/%d/%y'),
+            datetime.strptime(row[2], '%I:%M:%S %p'),
+            datetime.strptime(row[3], '%m/%d/%y'),
+            datetime.strptime(row[4], '%I:%M:%S %p'),
+            row[0]
+        )
+    except Exception as e:
+        print(row)
+        raise e
 
 
 class Thunderbird(Dialect):

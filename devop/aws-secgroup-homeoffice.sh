@@ -6,7 +6,7 @@ set -euo pipefail
 # The description appearing near your inbound rule
 MYSG_DESC="Home Peter Moser"
 # Your current IP address (leave this if you want to find it automatically)
-MYIP=$(curl http://ipecho.net/plain 2>/dev/null)
+MYIP=$(curl -L http://ipecho.net/plain 2>/dev/null)
 #
 ### configuration - END
 

@@ -7,3 +7,25 @@ Query to use:
 https://graph.microsoft.com/v1.0/me/events?$top=500&$select=categories,subject,isAllDay,isCancelled,start,end
 
 Copy/paste the JSON output here as "calendar-output.json"
+
+run 
+
+```
+python3 -m costacc calendar-output.json MONTH YEAR > YEAR-MONTH-pm.csv
+```
+
+to import into the [backlog google drive spreadsheet](https://docs.google.com/spreadsheets/d/1C4ZPeuZUIj5Uj48nHYlw3Q7ZsTESiYPBdkOCfKcKE7k), do:
+
+```
+cat YEAR-MONTH-pm.csv YEAR-MONTH2-pm.csv ...... | ./costacc2backlog.py | p-cc
+```
+
+Open LibreOffice Calc and import it
+
+Copy/paste it into the spreadsheet.
+
+
+Alternatively, just do `./costacc2backlog.py > yourfile`
+```
+alias p-cc='xclip -selection clipboard'
+```
