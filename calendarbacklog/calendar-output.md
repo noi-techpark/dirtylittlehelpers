@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 Go to https://developer.microsoft.com/en-us/graph/graph-explorer
 Login
 Click "Modify permissions (preview)"
